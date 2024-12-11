@@ -1,0 +1,13 @@
+services:
+  app:
+    image: flickview:dev-latest
+    build:
+      context: .
+      dockerfile: docker/dev/Dockerfile
+    volumes:
+      - .:/home/node/app # Mount the current directory to the container
+    ports:
+      - '3000:3000' # Map Nuxt dev server to localhost
+    environment:
+      NODE_ENV: development
+    user: 'node' # Run as node user

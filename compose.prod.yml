@@ -1,0 +1,11 @@
+services:
+  app:
+    image: flickview:latest
+    build:
+      context: .
+      dockerfile: docker/prod/Dockerfile
+    ports:
+      - '80:3000' # Map to port 80 for production meanwhile we set up traefik
+    environment:
+      NODE_ENV: production
+    user: 'node' # Run as node user
