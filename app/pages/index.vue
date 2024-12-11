@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto px-4 py-8">
-    <h1 class="text-4xl font-bold mb-8 text-center text-tokyo-night-accent">Flickr Public Feed Viewer</h1>
+    <h1 class="text-4xl font-bold mb-8 text-center text-tokyo-night-accent">Flick View</h1>
     <div class="flex gap-4 mb-8">
       <input
         v-model="searchTerm"
