@@ -203,6 +203,13 @@ const removeTag = (index) => {
 };
 
 onMounted(() => {
+  // Initialize tags and currentPage from query parameters
+  if (route.query.tags) {
+    tags.value = route.query.tags.split(',');
+  }
+  if (route.query.page) {
+    currentPage.value = parseInt(route.query.page);
+  }
   searchImages();
 });
 
