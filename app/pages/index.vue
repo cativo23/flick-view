@@ -39,7 +39,7 @@
       </div>
 
     </div>
-    <div v-if="errorMessage" class="text-red-500 text-center mb-4">
+    <div v-if="errorMessage" class="text-tokyo-night-red text-center mb-4">
       {{ errorMessage }}
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -63,11 +63,11 @@
         <NuxtLink :to="`/images/${image.id}`">
           <img :src="image.url_m || fallbackImageUrl" :alt="image.title" class="w-full h-48 object-cover" />
           <div class="p-4">
-            <h2 class="font-semibold mb-2 truncate">{{ image.title }}</h2>
-            <p class="text-sm text-tokyo-night-text-muted mb-2">By {{ image.ownername }}</p>
-            <p class="text-sm text-tokyo-night-text-muted mb-2">Taken: {{ new Date(image.datetaken).toLocaleDateString()
+            <h2 class="font-semibold mb-2 truncate text-tokyo-night-accent">{{ image.title }}</h2>
+            <p class="text-sm text-tokyo-night-text-muted mb-2"><span class="font-bold">By: </span> {{ image.ownername }}</p>
+            <p class="text-sm text-tokyo-night-text-muted mb-2"><span class="font-bold">Taken at: </span>  {{ new Date(image.datetaken).toLocaleDateString()
               }}</p>
-            <p class="text-sm text-tokyo-night-text-muted mb-2">Uploaded: {{ formatDate(image.dateupload) }}</p>
+            <p class="text-sm text-tokyo-night-text-muted mb-2"><span class="font-bold">Uploaded at: </span>  {{ formatDate(image.dateupload) }}</p>
             <p class="text-sm text-tokyo-night-text-muted truncate" v-html="image.description._content"></p>
           </div>
         </NuxtLink>
