@@ -1,12 +1,27 @@
 <template>
   <div class="container mx-auto px-4 py-8">
-    <NuxtLink to="/"><h1 class="text-4xl font-bold mb-8 text-center text-tokyo-night-accent">Flick View</h1></NuxtLink>
+    <NuxtLink to="/">
+      <h1 class="text-4xl font-bold mb-8 text-center text-tokyo-night-accent">Flick View</h1>
+    </NuxtLink>
     <div class="flex gap-4 mb-8">
       <NuxtTurnstile v-if="!captchaResolved" v-model="token" @success="onCaptchaSuccess" />
-      <input v-model="searchTerm" type="text" placeholder="Search by tags..."
-        class="flex-grow px-4 py-2 rounded-md bg-tokyo-night-bg-lighter border border-tokyo-night-border text-tokyo-night-text placeholder-tokyo-night-text-muted focus:outline-none focus:border-tokyo-night-accent"
-        :disabled="!captchaResolved"
-        @keyup.enter="searchImages" />
+      <div class="flex-grow">
+        <div class="flex flex-wrap gap-2 mb-2">
+          <span v-for="(tag, index) in tags" :key="index"
+            class="bg-tokyo-night-accent text-tokyo-night-bg px-2 py-1 rounded-full cursor-pointer"
+            @click="removeTag(index)">
+            {{ tag }}
+          </span>
+        </div>
+        <input v-model="searchTerm" type="text" placeholder="Search by tags..."
+          class="w-full px-4 py-2 rounded-md bg-tokyo-night-bg-lighter border border-tokyo-night-border text-tokyo-night-text placeholder-tokyo-night-text-muted focus:outline-none focus:border-tokyo-night-accent"
+          :disabled="!captchaResolved" @keyup.enter="searchImages" @keydown.tab.prevent="addTag" />
+        <p class="text-sm text-tokyo-night-text-muted mt-2">
+          <LucideKeyboard class="w-5 h-5 inline-block mr-2" />Press Tab
+          <LucideArrowRightToLine class="w-5 h-5 inline-block mr-2" /> to add a tag, Enter
+          <LucideCornerDownLeft class="w-5 h-5 inline-block mr-2" /> to search
+        </p>
+      </div>
       <button @click="searchImages"
         class="px-4 py-2 bg-tokyo-night-accent text-tokyo-night-bg rounded-md hover:bg-tokyo-night-accent-hover transition-colors duration-200">
         <LucideSearch class="w-5 h-5 inline-block mr-2" />
@@ -65,21 +80,24 @@ const runtimeConfig = useRuntimeConfig();
 const router = useRouter();
 const route = useRoute();
 
-const searchTerm = ref(route.query.tags || '');
+const searchTerm = ref('');
+const tags = ref([]);
 const images = ref([]);
 const loading = ref(false);
 const currentPage = ref(parseInt(route.query.page) || 1);
 const totalPages = ref(1);
+const token = ref('');
+const captchaResolved = ref(false);
 
 const filteredImages = computed(() => {
   return images.value;
-})
+});
 
 const updateQueryParams = () => {
   router.push({
     query: {
+      tags: tags.value.join(','),
       page: currentPage.value,
-      tags: searchTerm.value,
     },
   });
 };
@@ -89,14 +107,13 @@ const searchImages = async () => {
     loading.value = true;
     let tagsQueryParam = '';
 
-    if (searchTerm.value !== '') {
-      tagsQueryParam = `&tags=${searchTerm.value}`;
+    if (tags.value.length > 0) {
+      tagsQueryParam = `&tags=${tags.value.join(',')}`;
     }
 
     const apiUrl = `${runtimeConfig.public.flickViewApiUrl}/feed?per_page=12&page=${currentPage.value}` + tagsQueryParam;
     const response = await fetch(apiUrl);
     const data = await response.json();
-    console.log('Fetched images:', data.data);
     images.value = data.data;
     totalPages.value = data.pagination.pages;
     updateQueryParams();
@@ -164,7 +181,21 @@ const onCaptchaSuccess = () => {
   captchaResolved.value = true;
 };
 
+const addTag = () => {
+  if (searchTerm.value.trim() !== '') {
+    tags.value.push(searchTerm.value.trim());
+    searchTerm.value = '';
+  }
+};
+
+const removeTag = (index) => {
+  tags.value.splice(index, 1);
+};
+
 onMounted(() => {
+  if (process.env.NODE_ENV === 'development') {
+    captchaResolved.value = true;
+  }
   searchImages();
 });
 
