@@ -1,7 +1,15 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   // https://nuxt.com/modules
-  modules: ['@nuxthub/core', '@nuxt/eslint', '@nuxtjs/tailwindcss', 'nuxt-lucide-icons'],
+  modules: [
+    '@nuxthub/core',
+    '@nuxt/eslint',
+    '@nuxtjs/tailwindcss',
+    'nuxt-lucide-icons',
+    'nuxt-security',
+    '@nuxtjs/turnstile',
+    '@nuxt/scripts',
+  ],
 
   // https://devtools.nuxt.com
   devtools: { enabled: true },
@@ -10,6 +18,9 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       flickViewApiUrl: 'https://api.flickview.com',
+    },
+    turnstile: {
+      secretKey: '',
     },
   },
   // https://nuxt.com/docs/getting-started/upgrade#testing-nuxt-4
@@ -26,5 +37,8 @@ export default defineNuxtConfig({
         quotes: 'single',
       },
     },
+  },
+  turnstile: {
+    siteKey: '',
   },
 })

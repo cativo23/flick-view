@@ -2,6 +2,7 @@
   <div class="container mx-auto px-4 py-8">
     <NuxtLink to="/"><h1 class="text-4xl font-bold mb-8 text-center text-tokyo-night-accent">Flick View</h1></NuxtLink>
     <div class="flex gap-4 mb-8">
+      <NuxtTurnstile v-model="token" />
       <input v-model="searchTerm" type="text" placeholder="Search by tags..."
         class="flex-grow px-4 py-2 rounded-md bg-tokyo-night-bg-lighter border border-tokyo-night-border text-tokyo-night-text placeholder-tokyo-night-text-muted focus:outline-none focus:border-tokyo-night-accent"
         @keyup.enter="searchImages" />
