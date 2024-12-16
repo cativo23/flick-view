@@ -41,4 +41,11 @@ export default defineNuxtConfig({
   turnstile: {
     siteKey: '',
   },
+  security: {
+    headers: {
+      contentSecurityPolicy: {
+        'img-src': ["'self'", 'https://*.flickr.com'],
+      }
+    }
+  }
 })

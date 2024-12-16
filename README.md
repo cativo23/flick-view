@@ -1,32 +1,29 @@
-# Hello Edge
+# Flick View
 
-A minimal [Nuxt](https://nuxt.com) starter deployed on the Edge using [NuxtHub](https://hub.nuxt.com).
-
-https://hello.nuxt.dev
-
-<a href="https://hello.nuxt.dev">
-<img src="https://github.com/nuxt-hub/hello-edge/assets/904724/99d1bd54-ef7e-4ac9-83ad-0a290f85edcf" alt="Hello World template for NuxtHub" />
-</a>
+Flick View is a web application built with [Nuxt](https://nuxt.com) that allows users to search and view images from Flickr. The application is styled using Tailwind CSS and Daisy UI, and it supports pagination and detailed views of individual images with comments.
 
 ## Features
 
+- Search images by tags
+- Display images in a responsive grid
+- Skeleton loading screens
+- Pagination with ellipsis for large page numbers
+- Detailed view of individual images with comments
 - Server-Side rendering on Cloudflare Workers
 - ESLint setup
-- Ready to add a database, blob and KV storage
-- One click deploy on 275+ locations for free
 
 ## Setup
 
-Make sure to install the dependencies with [pnpm](https://pnpm.io/installation#using-corepack):
+Make sure to install the dependencies with [yarn](https://yarnpkg.com/):
 
 ```bash
-pnpm install
+yarn install
 ```
 
-You can update the main text displayed by creating a `.env`:
+You can change the api URL by adding a .env file withe nect content:
 
 ```bash
-NUXT_PUBLIC_HELLO_TEXT="Hello my world!"
+NUXT_PUBLIC_FLICK_VIEW_API_URL="http://localhost/api"
 ```
 
 ## Development Server
@@ -34,7 +31,7 @@ NUXT_PUBLIC_HELLO_TEXT="Hello my world!"
 Start the development server on `http://localhost:3000`:
 
 ```bash
-pnpm dev
+yarn dev
 ```
 
 ## Production
@@ -42,7 +39,7 @@ pnpm dev
 Build the application for production:
 
 ```bash
-pnpm build
+yarn build
 ```
 
 ## Deploy
@@ -58,3 +55,91 @@ Then checkout your server logs, analaytics and more in the [NuxtHub Admin](https
 
 You can also deploy using [Cloudflare Pages CI](https://hub.nuxt.com/docs/getting-started/deploy#cloudflare-pages-ci).
 
+Sure, I'll update the 
+
+README.md
+
+ to use `yarn` instead of `pnpm`.
+
+```markdown
+# Flick View
+
+Flick View is a web application built with [Nuxt](https://nuxt.com) that allows users to search and view images from Flickr. The application is styled using Tailwind CSS and Daisy UI, and it supports pagination and detailed views of individual images with comments.
+
+## Features
+
+- Search images by tags
+- Display images in a responsive grid
+- Skeleton loading screens
+- Pagination with ellipsis for large page numbers
+- Detailed view of individual images with comments
+- Server-Side rendering on Cloudflare Workers
+- ESLint setup
+
+## Setup
+
+Make sure to install the dependencies with [yarn](https://yarnpkg.com/):
+
+```bash
+yarn install
+```
+
+You can update the main text displayed by creating a 
+
+.env
+
+:
+
+```bash
+NUXT_PUBLIC_FLICK_VIEW_API_URL="https://your-api-url.com"
+```
+
+## Development Server
+
+Start the development server on `http://localhost:3000`:
+
+```bash
+yarn dev
+```
+
+## Production
+
+Build the application for production:
+
+```bash
+yarn build
+```
+
+## Deploy
+
+Deploy the application on the Edge with [NuxtHub](https://hub.nuxt.com) on your Cloudflare account:
+
+```bash
+npx nuxthub deploy
+```
+
+Then checkout your server logs, analytics and more in the [NuxtHub Admin](https://admin.hub.nuxt.com).
+
+You can also deploy using [Cloudflare Pages CI](https://hub.nuxt.com/docs/getting-started/deploy#cloudflare-pages-ci).
+
+## Usage
+
+### Search Images
+
+1. Enter tags in the search bar and press Enter or click the Search button.
+2. The application will display images related to the entered tags.
+
+### View Image Details
+
+1. Click on an image to view its details.
+2. The detailed view includes the image, its title, owner, taken date, upload date, description, and comments.
+
+### Pagination
+
+1. Use the Previous and Next buttons to navigate through pages.
+2. Click on page numbers to jump to a specific page.
+3. Ellipsis (`...`) will appear for large page numbers to simplify navigation.
+
+## License
+
+This project is licensed under the MIT License.
