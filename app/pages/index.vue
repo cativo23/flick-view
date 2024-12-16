@@ -48,8 +48,7 @@
           <div class="p-4">
             <h2 class="font-semibold mb-2 truncate">{{ image.title }}</h2>
             <p class="text-sm text-tokyo-night-text-muted mb-2">By {{ image.ownername }}</p>
-            <p class="text-sm text-tokyo-night-text-muted mb-2">Taken: {{ new Date(image.datetaken).toLocaleDateString()
-              }}</p>
+            <p class="text-sm text-tokyo-night-text-muted mb-2">Taken: {{ new Date(image.datetaken).toLocaleDateString() }}</p>
             <p class="text-sm text-tokyo-night-text-muted mb-2">Uploaded: {{ formatDate(image.dateupload) }}</p>
             <p class="text-sm text-tokyo-night-text-muted truncate" v-html="image.description._content"></p>
           </div>
@@ -58,16 +57,16 @@
     </div>
     <div class="flex justify-center mt-8">
       <button @click="prevPage" :disabled="currentPage === 1"
-        class="px-4 py-2 mx-2 bg-tokyo-night-accent text-tokyo-night-bg rounded-md hover:bg-tokyo-night-accent-hover transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-        Previous
+        class="px-2 py-2 mx-1 bg-tokyo-night-accent text-tokyo-night-bg rounded-md hover:bg-tokyo-night-accent-hover transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+        <LucideArrowLeft class="w-5 h-5 inline-block mr-2" />
       </button>
       <button v-for="page in pages" :key="page" @click="goToPage(page)"
-        :class="['px-4 py-2 mx-1 rounded-md transition-colors duration-200', { 'bg-tokyo-night-accent text-tokyo-night-bg': page === currentPage, 'bg-tokyo-night-bg-lighter text-tokyo-night-text': page !== currentPage }]">
+        :class="['px-2 py-2 mx-1 rounded-md transition-colors duration-200', { 'bg-tokyo-night-accent text-tokyo-night-bg': page === currentPage, 'bg-tokyo-night-bg-lighter text-tokyo-night-text': page !== currentPage }]">
         {{ page }}
       </button>
       <button @click="nextPage" :disabled="currentPage === totalPages"
-        class="px-4 py-2 mx-2 bg-tokyo-night-accent text-tokyo-night-bg rounded-md hover:bg-tokyo-night-accent-hover transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-        Next
+        class="px-2 py-2 mx-1 bg-tokyo-night-accent text-tokyo-night-bg rounded-md hover:bg-tokyo-night-accent-hover transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+       <LucideArrowRight class="w-5 h-5 inline-block mr-2" />
       </button>
     </div>
   </div>
@@ -147,7 +146,7 @@ const goToPage = (page) => {
 
 const pages = computed(() => {
   const range = [];
-  const maxPagesToShow = 4;
+  const maxPagesToShow = 2; // Adjust the number of visible pages
   const startPage = Math.max(1, currentPage.value - Math.floor(maxPagesToShow / 2));
   const endPage = Math.min(totalPages.value, startPage + maxPagesToShow - 1);
 
@@ -181,10 +180,11 @@ const onCaptchaSuccess = () => {
   captchaResolved.value = true;
 };
 
-const addTag = () => {
+const addTag = (event) => {
   if (searchTerm.value.trim() !== '') {
     tags.value.push(searchTerm.value.trim());
     searchTerm.value = '';
+    event.preventDefault();
   }
 };
 
