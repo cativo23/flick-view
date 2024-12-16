@@ -15,7 +15,7 @@
     </div>
     <div v-else class="mt-8">
       <div v-if="image" class="bg-tokyo-night-bg-lighter rounded-lg overflow-hidden shadow-lg">
-        <img :src="imageSource" :alt="image.title._content" class="w-full h-96 object-cover" />
+        <img :src="imageSource || fallbackImageUrl" :alt="image.title._content" class="w-full h-96 object-cover" />
         <div class="p-4">
           <NuxtLink :href="image.urls.url[0]?._content" external target="_blank">
             <h1 class="text-2xl font-bold mb-2">{{ image.title._content }}</h1>
@@ -110,6 +110,7 @@ const comments = ref<Comment[]>([]);
 const commentsSize = ref<number>(0);
 const loading = ref<boolean>(true);
 const imageSource = ref<string | undefined>(undefined);
+const fallbackImageUrl = '/fallback.png';
 
 const runtimeConfig = useRuntimeConfig();
 
