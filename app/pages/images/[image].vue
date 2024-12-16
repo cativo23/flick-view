@@ -60,6 +60,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
 interface Image {
   id: string;
   url_m: string;
@@ -143,7 +144,6 @@ const fetchComments = async (): Promise<Comment[]> => {
     comments.value = data.data.comment;
   } catch (error) {
     errorComments.value = 'Error fetching comments. Please try again later.';
-    console.error('Error fetching comments:', error);
     return [];
   }
 };
