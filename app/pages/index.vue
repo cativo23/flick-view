@@ -3,8 +3,8 @@
     <NuxtLink to="/" external>
       <h1 class="text-4xl font-bold mb-8 text-center text-tokyo-night-accent">Flick View</h1>
     </NuxtLink>
+    <NuxtTurnstile v-if="!captchaResolved" v-model="token"/>
     <div class="flex gap-4 mb-8">
-      <NuxtTurnstile v-if="!captchaResolved" v-model="token" @success="onCaptchaSuccess" />
       <div class="flex-grow">
         <div class="flex flex-wrap gap-2 mb-2">
           <span v-for="(tag, index) in tags" :key="index"
@@ -96,7 +96,7 @@ const images = ref([]);
 const loading = ref(false);
 const currentPage = ref(parseInt(route.query.page) || 1);
 const totalPages = ref(1);
-const token = ref('');
+const token = ref();
 const captchaResolved = ref(false);
 const fallbackImageUrl = 'fallback.png';
 
@@ -145,14 +145,12 @@ const nextPage = () => {
 const prevPage = () => {
   if (currentPage.value > 1) {
     currentPage.value--;
-    searchImages();
   }
 };
 
 const goToPage = (page) => {
   if (page >= 1 && page <= totalPages.value) {
     currentPage.value = page;
-    searchImages();
   }
 };
 
@@ -205,13 +203,16 @@ const removeTag = (index) => {
 };
 
 onMounted(() => {
-  if (process.env.NODE_ENV === 'development') {
-    captchaResolved.value = true;
-  }
   searchImages();
 });
 
 watch([currentPage], () => {
   searchImages();
+});
+
+watch(token, (newToken) => {
+  if (newToken) {
+    captchaResolved.value = true;
+  }
 });
 </script>
