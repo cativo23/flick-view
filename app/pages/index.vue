@@ -203,6 +203,9 @@ const removeTag = (index) => {
 };
 
 onMounted(() => {
+  if (process.env.NODE_ENV === 'development') {
+    captchaResolved.value = true;
+  }
   searchImages();
 });
 
