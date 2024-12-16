@@ -2,9 +2,10 @@
   <div class="container mx-auto px-4 py-8">
     <NuxtLink to="/"><h1 class="text-4xl font-bold mb-8 text-center text-tokyo-night-accent">Flick View</h1></NuxtLink>
     <div class="flex gap-4 mb-8">
-      <NuxtTurnstile v-model="token" />
+      <NuxtTurnstile v-if="!captchaResolved" v-model="token" @success="onCaptchaSuccess" />
       <input v-model="searchTerm" type="text" placeholder="Search by tags..."
         class="flex-grow px-4 py-2 rounded-md bg-tokyo-night-bg-lighter border border-tokyo-night-border text-tokyo-night-text placeholder-tokyo-night-text-muted focus:outline-none focus:border-tokyo-night-accent"
+        :disabled="!captchaResolved"
         @keyup.enter="searchImages" />
       <button @click="searchImages"
         class="px-4 py-2 bg-tokyo-night-accent text-tokyo-night-bg rounded-md hover:bg-tokyo-night-accent-hover transition-colors duration-200">
@@ -157,6 +158,10 @@ const pages = computed(() => {
 const formatDate = (timestamp) => {
   const date = new Date(timestamp * 1000);
   return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+};
+
+const onCaptchaSuccess = () => {
+  captchaResolved.value = true;
 };
 
 onMounted(() => {
