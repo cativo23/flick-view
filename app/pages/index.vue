@@ -6,6 +6,7 @@
     <NuxtTurnstile v-if="!captchaResolved" v-model="token"/>
     <div class="flex gap-4 mb-8">
       <div class="flex-grow">
+        <p>Search By Tags:</p>
         <div class="flex flex-wrap gap-2 mb-2">
           <span v-for="(tag, index) in tags" :key="index"
             class="bg-tokyo-night-accent text-tokyo-night-bg px-2 py-1 rounded-full cursor-pointer"
@@ -13,6 +14,9 @@
             {{ tag }}
           </span>
         </div>
+        <p v-if="tags.length >0" class="text-sm text-tokyo-night-text-muted mb-2">
+          Click or tap on a tag to remove it.
+        </p>
         <div class="flex items-center gap-2">
           <input v-model="searchTerm" type="text" placeholder="Search by tags..."
             class="w-full px-4 py-2 rounded-md bg-tokyo-night-bg-lighter border border-tokyo-night-border text-tokyo-night-text placeholder-tokyo-night-text-muted focus:outline-none focus:border-tokyo-night-accent"
