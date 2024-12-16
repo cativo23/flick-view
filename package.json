@@ -27,5 +27,8 @@
     "vue-tsc": "^2.1.10",
     "wrangler": "^3.84.1"
   },
-  "packageManager": "yarn@1.22.22"
+  "packageManager": "yarn@1.22.22",
+  "engines": {
+    "node" : ">=22.0.0"
+  }
 }
