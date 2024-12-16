@@ -35,6 +35,9 @@
       </div>
 
     </div>
+    <div v-if="errorMessage" class="text-red-500 text-center mb-4">
+      {{ errorMessage }}
+    </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <div v-if="loading" v-for="num in [1, 2, 3, 4]" :key="num" class="animate-pulse">
         <div class="bg-tokyo-night-bg-lighter rounded-lg overflow-hidden shadow-lg">
@@ -99,6 +102,7 @@ const totalPages = ref(1);
 const token = ref();
 const captchaResolved = ref(false);
 const fallbackImageUrl = 'fallback.png';
+const errorMessage = ref('');
 
 const filteredImages = computed(() => {
   return images.value;
@@ -116,6 +120,7 @@ const updateQueryParams = () => {
 const searchImages = async () => {
   try {
     loading.value = true;
+    errorMessage.value = ''; // Clear any previous error message
     let tagsQueryParam = '';
 
     if (tags.value.length > 0) {
@@ -124,11 +129,15 @@ const searchImages = async () => {
 
     const apiUrl = `${runtimeConfig.public.flickViewApiUrl}/feed?per_page=12&page=${currentPage.value}` + tagsQueryParam;
     const response = await fetch(apiUrl);
+    if (!response.ok) {
+      throw new Error('Failed to fetch images');
+    }
     const data = await response.json();
     images.value = data.data;
     totalPages.value = data.pagination.pages;
     updateQueryParams();
   } catch (error) {
+    errorMessage.value = 'Error fetching images. Please try again later.';
     console.error('Error fetching images:', error);
   } finally {
     loading.value = false;
@@ -145,12 +154,14 @@ const nextPage = () => {
 const prevPage = () => {
   if (currentPage.value > 1) {
     currentPage.value--;
+    searchImages();
   }
 };
 
 const goToPage = (page) => {
   if (page >= 1 && page <= totalPages.value) {
     currentPage.value = page;
+    searchImages();
   }
 };
 
