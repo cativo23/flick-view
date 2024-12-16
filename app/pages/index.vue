@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto px-4 py-8">
-    <NuxtLink to="/">
+    <NuxtLink to="/" external>
       <h1 class="text-4xl font-bold mb-8 text-center text-tokyo-night-accent">Flick View</h1>
     </NuxtLink>
     <div class="flex gap-4 mb-8">
@@ -13,20 +13,27 @@
             {{ tag }}
           </span>
         </div>
-        <input v-model="searchTerm" type="text" placeholder="Search by tags..."
-          class="w-full px-4 py-2 rounded-md bg-tokyo-night-bg-lighter border border-tokyo-night-border text-tokyo-night-text placeholder-tokyo-night-text-muted focus:outline-none focus:border-tokyo-night-accent"
-          :disabled="!captchaResolved" @keyup.enter="searchImages" @keydown.tab.prevent="addTag" />
+        <div class="flex items-center gap-2">
+          <input v-model="searchTerm" type="text" placeholder="Search by tags..."
+            class="w-full px-4 py-2 rounded-md bg-tokyo-night-bg-lighter border border-tokyo-night-border text-tokyo-night-text placeholder-tokyo-night-text-muted focus:outline-none focus:border-tokyo-night-accent"
+            :disabled="!captchaResolved" @keyup.enter="searchImages" @keydown.tab.prevent="addTag" />
+          <button @click="addTag"
+            class="px-4 py-2 bg-tokyo-night-accent text-tokyo-night-bg rounded-md hover:bg-tokyo-night-accent-hover transition-colors duration-200">
+            Add Tag
+          </button>
+          <button @click="searchImages"
+            class="px-4 py-2 bg-tokyo-night-accent text-tokyo-night-bg rounded-md hover:bg-tokyo-night-accent-hover transition-colors duration-200">
+            <LucideSearch class="w-5 h-5 inline-block mr-2" />
+            Search
+          </button>
+        </div>
+
         <p class="text-sm text-tokyo-night-text-muted mt-2">
-          <LucideKeyboard class="w-5 h-5 inline-block mr-2" />Press Tab
-          <LucideArrowRightToLine class="w-5 h-5 inline-block mr-2" /> to add a tag, Enter
+          <LucideKeyboard class="w-5 h-5 inline-block mr-2" />Press Tab or click "Add Tag" to add a tag, Enter
           <LucideCornerDownLeft class="w-5 h-5 inline-block mr-2" /> to search
         </p>
       </div>
-      <button @click="searchImages"
-        class="px-4 py-2 bg-tokyo-night-accent text-tokyo-night-bg rounded-md hover:bg-tokyo-night-accent-hover transition-colors duration-200">
-        <LucideSearch class="w-5 h-5 inline-block mr-2" />
-        Search
-      </button>
+
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <div v-if="loading" v-for="num in [1, 2, 3, 4]" :key="num" class="animate-pulse">
@@ -41,14 +48,18 @@
           </div>
         </div>
       </div>
-      <div v-if="!loading" v-for="image in filteredImages" :key="image.id"
+      <div v-if="!loading && filteredImages.length === 0" class="col-span-4 text-center text-tokyo-night-text-muted">
+        No images found.
+      </div>
+      <div v-if="!loading && filteredImages.length > 0" v-for="image in filteredImages" :key="image.id"
         class="bg-tokyo-night-bg-lighter rounded-lg overflow-hidden shadow-lg transition-transform hover:scale-105">
         <NuxtLink :to="`/images/${image.id}`">
-          <img :src="image.url_m" :alt="image.title" class="w-full h-48 object-cover" />
+          <img :src="image.url_m || fallbackImageUrl" :alt="image.title" class="w-full h-48 object-cover" />
           <div class="p-4">
             <h2 class="font-semibold mb-2 truncate">{{ image.title }}</h2>
             <p class="text-sm text-tokyo-night-text-muted mb-2">By {{ image.ownername }}</p>
-            <p class="text-sm text-tokyo-night-text-muted mb-2">Taken: {{ new Date(image.datetaken).toLocaleDateString() }}</p>
+            <p class="text-sm text-tokyo-night-text-muted mb-2">Taken: {{ new Date(image.datetaken).toLocaleDateString()
+              }}</p>
             <p class="text-sm text-tokyo-night-text-muted mb-2">Uploaded: {{ formatDate(image.dateupload) }}</p>
             <p class="text-sm text-tokyo-night-text-muted truncate" v-html="image.description._content"></p>
           </div>
@@ -56,7 +67,7 @@
       </div>
     </div>
     <div class="flex justify-center mt-8">
-      <button @click="prevPage" :disabled="currentPage === 1"
+      <button @click="prevPage" :disabled="currentPage === 1" v-if="filteredImages.length !== 0"
         class="px-2 py-2 mx-1 bg-tokyo-night-accent text-tokyo-night-bg rounded-md hover:bg-tokyo-night-accent-hover transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
         <LucideArrowLeft class="w-5 h-5 inline-block mr-2" />
       </button>
@@ -64,9 +75,9 @@
         :class="['px-2 py-2 mx-1 rounded-md transition-colors duration-200', { 'bg-tokyo-night-accent text-tokyo-night-bg': page === currentPage, 'bg-tokyo-night-bg-lighter text-tokyo-night-text': page !== currentPage }]">
         {{ page }}
       </button>
-      <button @click="nextPage" :disabled="currentPage === totalPages"
+      <button @click="nextPage" :disabled="currentPage === totalPages" v-if="filteredImages.length !== 0"
         class="px-2 py-2 mx-1 bg-tokyo-night-accent text-tokyo-night-bg rounded-md hover:bg-tokyo-night-accent-hover transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-       <LucideArrowRight class="w-5 h-5 inline-block mr-2" />
+        <LucideArrowRight class="w-5 h-5 inline-block mr-2" />
       </button>
     </div>
   </div>
@@ -87,6 +98,7 @@ const currentPage = ref(parseInt(route.query.page) || 1);
 const totalPages = ref(1);
 const token = ref('');
 const captchaResolved = ref(false);
+const fallbackImageUrl = 'fallback.png';
 
 const filteredImages = computed(() => {
   return images.value;
@@ -146,7 +158,7 @@ const goToPage = (page) => {
 
 const pages = computed(() => {
   const range = [];
-  const maxPagesToShow = 2; // Adjust the number of visible pages
+  const maxPagesToShow = 2;
   const startPage = Math.max(1, currentPage.value - Math.floor(maxPagesToShow / 2));
   const endPage = Math.min(totalPages.value, startPage + maxPagesToShow - 1);
 
@@ -184,7 +196,7 @@ const addTag = (event) => {
   if (searchTerm.value.trim() !== '') {
     tags.value.push(searchTerm.value.trim());
     searchTerm.value = '';
-    event.preventDefault();
+    if (event) event.preventDefault();
   }
 };
 
