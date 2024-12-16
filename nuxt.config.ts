@@ -44,7 +44,7 @@ export default defineNuxtConfig({
   security: {
     headers: {
       contentSecurityPolicy: {
-        'img-src': ["'self'", 'https://*.flickr.com'],
+        'img-src': ["'self'", 'https://*.flickr.com', 'https://*.staticflickr.com'],
       }
     }
   }
