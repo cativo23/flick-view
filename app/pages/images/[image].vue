@@ -1,4 +1,5 @@
 <template>
+  hello
   <div class="container mx-auto px-4 py-8">
     <NuxtLink to="/" class="text-tokyo-night-accent hover:underline">Back to Gallery</NuxtLink>
     <div v-if="loading" class="animate-pulse mt-8">
@@ -113,7 +114,6 @@ const route = useRoute();
 const imageId = route.params.image as string;
 const image = ref<Image | null>(null);
 const comments = ref<Comment[]>([]);
-const commentsSize = ref<number>(0);
 const loading = ref<boolean>(true);
 const imageSource = ref<string | undefined>(undefined);
 const errorMessage = ref('');
@@ -127,7 +127,6 @@ const fetchImageDetails = async () => {
     const response = await fetch(apiUrl);
     const data = await response.json();
     image.value = data.data as Image;
-    commentsSize.value = data.data.comments._content;
     imageSource.value = image.value.images.find(size => size.label === 'Large')?.source;
   } catch (error) {
     errorMessage.value = 'Error fetching image details. Please try again later.';
