@@ -19,6 +19,7 @@ export default {
           accent: '#7aa2f7',
           'accent-hover': '#2ac3de',
           border: '#414868',
+          red: '#ff6480',
         },
       },
     },

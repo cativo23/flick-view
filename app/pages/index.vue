@@ -7,6 +7,7 @@
     <div class="flex gap-4 mb-8">
       <div class="flex-grow">
         <div class="flex flex-wrap gap-2 mb-2">
+          <p class="px-2 py-1 text-tokyo-night-text-muted">Tags:</p>
           <span v-for="(tag, index) in tags" :key="index"
             class="bg-tokyo-night-accent text-tokyo-night-bg px-2 py-1 rounded-full cursor-pointer"
             @click="removeTag(index)">
@@ -35,7 +36,10 @@
       </div>
 
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div v-if="errorMessage" class="text-tokyo-night-red text-center mb-4">
+      {{ errorMessage }}
+    </div>
+    <div v-if="!errorMessage" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <div v-if="loading" v-for="num in [1, 2, 3, 4]" :key="num" class="animate-pulse">
         <div class="bg-tokyo-night-bg-lighter rounded-lg overflow-hidden shadow-lg">
           <div class="w-full h-48 bg-tokyo-night-bg"></div>
@@ -56,7 +60,7 @@
         <NuxtLink :to="`/images/${image.id}`">
           <img :src="image.url_m || fallbackImageUrl" :alt="image.title" class="w-full h-48 object-cover" />
           <div class="p-4">
-            <h2 class="font-semibold mb-2 truncate">{{ image.title }}</h2>
+            <h2 class="font-semibold mb-2 truncate text-tokyo-night-accent">{{ image.title }}</h2>
             <p class="text-sm text-tokyo-night-text-muted mb-2">By {{ image.ownername }}</p>
             <p class="text-sm text-tokyo-night-text-muted mb-2">Taken: {{ new Date(image.datetaken).toLocaleDateString()
               }}</p>
@@ -99,6 +103,7 @@ const totalPages = ref(1);
 const token = ref();
 const captchaResolved = ref(false);
 const fallbackImageUrl = 'fallback.png';
+const errorMessage = ref('');
 
 const filteredImages = computed(() => {
   return images.value;
@@ -116,6 +121,7 @@ const updateQueryParams = () => {
 const searchImages = async () => {
   try {
     loading.value = true;
+    errorMessage.value = ''; // Clear any previous error message
     let tagsQueryParam = '';
 
     if (tags.value.length > 0) {
@@ -124,11 +130,15 @@ const searchImages = async () => {
 
     const apiUrl = `${runtimeConfig.public.flickViewApiUrl}/feed?per_page=12&page=${currentPage.value}` + tagsQueryParam;
     const response = await fetch(apiUrl);
+    if (!response.ok) {
+      throw new Error('Failed to fetch images');
+    }
     const data = await response.json();
     images.value = data.data;
     totalPages.value = data.pagination.pages;
     updateQueryParams();
   } catch (error) {
+    errorMessage.value = 'Error fetching images. Please try again later.';
     console.error('Error fetching images:', error);
   } finally {
     loading.value = false;
@@ -145,12 +155,14 @@ const nextPage = () => {
 const prevPage = () => {
   if (currentPage.value > 1) {
     currentPage.value--;
+    searchImages();
   }
 };
 
 const goToPage = (page) => {
   if (page >= 1 && page <= totalPages.value) {
     currentPage.value = page;
+    searchImages();
   }
 };
 

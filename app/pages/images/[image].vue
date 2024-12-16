@@ -14,6 +14,9 @@
       </div>
     </div>
     <div v-else class="mt-8">
+      <div v-if="errorMessage" class="text-tokyo-night-red text-center mb-4">
+        {{ errorMessage }}
+      </div>
       <div v-if="image" class="bg-tokyo-night-bg-lighter rounded-lg overflow-hidden shadow-lg">
         <img :src="imageSource" :alt="image.title._content" class="w-full h-96 object-cover" />
         <div class="p-4">
@@ -41,7 +44,10 @@
       <div class="bg-tokyo-night-bg-lighter rounded-lg overflow-hidden shadow-lg mt-4">
         <div class="p-4">
           <h2 class="text-xl font-semibold my-4">Comments</h2>
-          <div v-if="commentsSize <= 0" class="text-tokyo-night-text-muted">No comments available.</div>
+          <div v-if="errorComments" class="text-tokyo-night-red text-center mb-4">
+            {{ errorComments }}
+          </div>
+          <div v-if="!errorComments && comments.length <= 0" class="text-tokyo-night-text-muted">No comments available.</div>
           <div v-for="comment in comments" :key="comment.id" class="mb-4">
             <p class="text-sm text-tokyo-night-text-muted mb-1"><strong>{{ comment.authorname }}</strong> said:</p>
             <p class="text-sm text-tokyo-night-text" v-html="comment._content"></p>
@@ -110,6 +116,8 @@ const comments = ref<Comment[]>([]);
 const commentsSize = ref<number>(0);
 const loading = ref<boolean>(true);
 const imageSource = ref<string | undefined>(undefined);
+const errorMessage = ref('');
+const errorComments = ref('');
 
 const runtimeConfig = useRuntimeConfig();
 
@@ -118,26 +126,24 @@ const fetchImageDetails = async () => {
     const apiUrl = `${runtimeConfig.public.flickViewApiUrl}/photo/${imageId}`;
     const response = await fetch(apiUrl);
     const data = await response.json();
-    console.log('Image details:', data);
     image.value = data.data as Image;
     commentsSize.value = data.data.comments._content;
-    comments.value = await fetchComments(imageId);
     imageSource.value = image.value.images.find(size => size.label === 'Large')?.source;
   } catch (error) {
-    console.error('Error fetching image details:', error);
+    errorMessage.value = 'Error fetching image details. Please try again later.';
   } finally {
     loading.value = false;
   }
 };
 
-const fetchComments = async (imageId: string): Promise<Comment[]> => {
+const fetchComments = async (): Promise<Comment[]> => {
   try {
     const apiUrl = `${runtimeConfig.public.flickViewApiUrl}/photo/${imageId}/comments`;
     const response = await fetch(apiUrl);
     const data = await response.json();
-    console.log('Comments:', data);
-    return data.data.comment;
+    comments.value = data.data.comment;
   } catch (error) {
+    errorComments.value = 'Error fetching comments. Please try again later.';
     console.error('Error fetching comments:', error);
     return [];
   }
@@ -154,6 +160,7 @@ const formatDate = (timestamp: number): string => {
 
 onMounted(() => {
   fetchImageDetails();
+  fetchComments();
 });
 </script>
 
