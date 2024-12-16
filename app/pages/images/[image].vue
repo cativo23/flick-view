@@ -53,9 +53,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
-
 interface Image {
   id: string;
   url_m: string;
@@ -111,7 +108,7 @@ const imageId = route.params.image as string;
 const image = ref<Image | null>(null);
 const comments = ref<Comment[]>([]);
 const commentsSize = ref<number>(0);
-const loading = ref(true);
+const loading = ref<boolean>(true);
 const imageSource = ref<string | undefined>(undefined);
 
 const runtimeConfig = useRuntimeConfig();
