@@ -1,16 +1,39 @@
 <template>
   <div class="container mx-auto px-4 py-8">
-    <NuxtLink to="/"><h1 class="text-4xl font-bold mb-8 text-center text-tokyo-night-accent">Flick View</h1></NuxtLink>
+    <NuxtLink to="/" external>
+      <h1 class="text-4xl font-bold mb-8 text-center text-tokyo-night-accent">Flick View</h1>
+    </NuxtLink>
     <div class="flex gap-4 mb-8">
-      <NuxtTurnstile v-model="token" />
-      <input v-model="searchTerm" type="text" placeholder="Search by tags..."
-        class="flex-grow px-4 py-2 rounded-md bg-tokyo-night-bg-lighter border border-tokyo-night-border text-tokyo-night-text placeholder-tokyo-night-text-muted focus:outline-none focus:border-tokyo-night-accent"
-        @keyup.enter="searchImages" />
-      <button @click="searchImages"
-        class="px-4 py-2 bg-tokyo-night-accent text-tokyo-night-bg rounded-md hover:bg-tokyo-night-accent-hover transition-colors duration-200">
-        <LucideSearch class="w-5 h-5 inline-block mr-2" />
-        Search
-      </button>
+      <NuxtTurnstile v-if="!captchaResolved" v-model="token" @success="onCaptchaSuccess" />
+      <div class="flex-grow">
+        <div class="flex flex-wrap gap-2 mb-2">
+          <span v-for="(tag, index) in tags" :key="index"
+            class="bg-tokyo-night-accent text-tokyo-night-bg px-2 py-1 rounded-full cursor-pointer"
+            @click="removeTag(index)">
+            {{ tag }}
+          </span>
+        </div>
+        <div class="flex items-center gap-2">
+          <input v-model="searchTerm" type="text" placeholder="Search by tags..."
+            class="w-full px-4 py-2 rounded-md bg-tokyo-night-bg-lighter border border-tokyo-night-border text-tokyo-night-text placeholder-tokyo-night-text-muted focus:outline-none focus:border-tokyo-night-accent"
+            :disabled="!captchaResolved" @keyup.enter="searchImages" @keydown.tab.prevent="addTag" />
+          <button @click="addTag"
+            class="px-4 py-2 bg-tokyo-night-accent text-tokyo-night-bg rounded-md hover:bg-tokyo-night-accent-hover transition-colors duration-200">
+            Add Tag
+          </button>
+          <button @click="searchImages"
+            class="px-4 py-2 bg-tokyo-night-accent text-tokyo-night-bg rounded-md hover:bg-tokyo-night-accent-hover transition-colors duration-200">
+            <LucideSearch class="w-5 h-5 inline-block mr-2" />
+            Search
+          </button>
+        </div>
+
+        <p class="text-sm text-tokyo-night-text-muted mt-2">
+          <LucideKeyboard class="w-5 h-5 inline-block mr-2" />Press Tab or click "Add Tag" to add a tag, Enter
+          <LucideCornerDownLeft class="w-5 h-5 inline-block mr-2" /> to search
+        </p>
+      </div>
+
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <div v-if="loading" v-for="num in [1, 2, 3, 4]" :key="num" class="animate-pulse">
@@ -25,10 +48,13 @@
           </div>
         </div>
       </div>
-      <div v-if="!loading" v-for="image in filteredImages" :key="image.id"
+      <div v-if="!loading && filteredImages.length === 0" class="col-span-4 text-center text-tokyo-night-text-muted">
+        No images found.
+      </div>
+      <div v-if="!loading && filteredImages.length > 0" v-for="image in filteredImages" :key="image.id"
         class="bg-tokyo-night-bg-lighter rounded-lg overflow-hidden shadow-lg transition-transform hover:scale-105">
         <NuxtLink :to="`/images/${image.id}`">
-          <img :src="image.url_m" :alt="image.title" class="w-full h-48 object-cover" />
+          <img :src="image.url_m || fallbackImageUrl" :alt="image.title" class="w-full h-48 object-cover" />
           <div class="p-4">
             <h2 class="font-semibold mb-2 truncate">{{ image.title }}</h2>
             <p class="text-sm text-tokyo-night-text-muted mb-2">By {{ image.ownername }}</p>
@@ -41,17 +67,17 @@
       </div>
     </div>
     <div class="flex justify-center mt-8">
-      <button @click="prevPage" :disabled="currentPage === 1"
-        class="px-4 py-2 mx-2 bg-tokyo-night-accent text-tokyo-night-bg rounded-md hover:bg-tokyo-night-accent-hover transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-        Previous
+      <button @click="prevPage" :disabled="currentPage === 1" v-if="filteredImages.length !== 0"
+        class="px-2 py-2 mx-1 bg-tokyo-night-accent text-tokyo-night-bg rounded-md hover:bg-tokyo-night-accent-hover transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+        <LucideArrowLeft class="w-5 h-5 inline-block mr-2" />
       </button>
       <button v-for="page in pages" :key="page" @click="goToPage(page)"
-        :class="['px-4 py-2 mx-1 rounded-md transition-colors duration-200', { 'bg-tokyo-night-accent text-tokyo-night-bg': page === currentPage, 'bg-tokyo-night-bg-lighter text-tokyo-night-text': page !== currentPage }]">
+        :class="['px-2 py-2 mx-1 rounded-md transition-colors duration-200', { 'bg-tokyo-night-accent text-tokyo-night-bg': page === currentPage, 'bg-tokyo-night-bg-lighter text-tokyo-night-text': page !== currentPage }]">
         {{ page }}
       </button>
-      <button @click="nextPage" :disabled="currentPage === totalPages"
-        class="px-4 py-2 mx-2 bg-tokyo-night-accent text-tokyo-night-bg rounded-md hover:bg-tokyo-night-accent-hover transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-        Next
+      <button @click="nextPage" :disabled="currentPage === totalPages" v-if="filteredImages.length !== 0"
+        class="px-2 py-2 mx-1 bg-tokyo-night-accent text-tokyo-night-bg rounded-md hover:bg-tokyo-night-accent-hover transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+        <LucideArrowRight class="w-5 h-5 inline-block mr-2" />
       </button>
     </div>
   </div>
@@ -64,21 +90,25 @@ const runtimeConfig = useRuntimeConfig();
 const router = useRouter();
 const route = useRoute();
 
-const searchTerm = ref(route.query.tags || '');
+const searchTerm = ref('');
+const tags = ref([]);
 const images = ref([]);
 const loading = ref(false);
 const currentPage = ref(parseInt(route.query.page) || 1);
 const totalPages = ref(1);
+const token = ref('');
+const captchaResolved = ref(false);
+const fallbackImageUrl = 'fallback.png';
 
 const filteredImages = computed(() => {
   return images.value;
-})
+});
 
 const updateQueryParams = () => {
   router.push({
     query: {
+      tags: tags.value.join(','),
       page: currentPage.value,
-      tags: searchTerm.value,
     },
   });
 };
@@ -88,14 +118,13 @@ const searchImages = async () => {
     loading.value = true;
     let tagsQueryParam = '';
 
-    if (searchTerm.value !== '') {
-      tagsQueryParam = `&tags=${searchTerm.value}`;
+    if (tags.value.length > 0) {
+      tagsQueryParam = `&tags=${tags.value.join(',')}`;
     }
 
     const apiUrl = `${runtimeConfig.public.flickViewApiUrl}/feed?per_page=12&page=${currentPage.value}` + tagsQueryParam;
     const response = await fetch(apiUrl);
     const data = await response.json();
-    console.log('Fetched images:', data.data);
     images.value = data.data;
     totalPages.value = data.pagination.pages;
     updateQueryParams();
@@ -129,7 +158,7 @@ const goToPage = (page) => {
 
 const pages = computed(() => {
   const range = [];
-  const maxPagesToShow = 4;
+  const maxPagesToShow = 2;
   const startPage = Math.max(1, currentPage.value - Math.floor(maxPagesToShow / 2));
   const endPage = Math.min(totalPages.value, startPage + maxPagesToShow - 1);
 
@@ -159,7 +188,26 @@ const formatDate = (timestamp) => {
   return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
 };
 
+const onCaptchaSuccess = () => {
+  captchaResolved.value = true;
+};
+
+const addTag = (event) => {
+  if (searchTerm.value.trim() !== '') {
+    tags.value.push(searchTerm.value.trim());
+    searchTerm.value = '';
+    if (event) event.preventDefault();
+  }
+};
+
+const removeTag = (index) => {
+  tags.value.splice(index, 1);
+};
+
 onMounted(() => {
+  if (process.env.NODE_ENV === 'development') {
+    captchaResolved.value = true;
+  }
   searchImages();
 });
 
