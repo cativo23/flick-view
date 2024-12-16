@@ -26,7 +26,7 @@
       </div>
       <div v-if="!loading" v-for="image in filteredImages" :key="image.id"
         class="bg-tokyo-night-bg-lighter rounded-lg overflow-hidden shadow-lg transition-transform hover:scale-105">
-        <NuxtLink :to="`/image/${image.id}`">
+        <NuxtLink :to="`/images/${image.id}`">
           <img :src="image.url_m" :alt="image.title" class="w-full h-48 object-cover" />
           <div class="p-4">
             <h2 class="font-semibold mb-2 truncate">{{ image.title }}</h2>
