@@ -53,54 +53,11 @@
 </template>
 
 <script setup lang="ts">
-interface Image {
-  id: string;
-  title: {
-    _content: string;
-  };
-  owner: {
-    realname: string;
-    username: string;
-  };
-  dates: {
-    taken: string;
-    posted: number;
-    lastupdate: number;
-  };
-  description: {
-    _content: string;
-  };
-  urls: {
-    url: Url[];
-  };
-  images: ImageSize[];
-  tags: {
-    tag: Tag[];
-  };
-}
+import { ref, onMounted } from 'vue';
+import { fetchImageDetails, fetchComments } from '../../../services/apiService';
+import type { Image } from '../../../types/Image';
+import type { Comment } from '../../../types/Comment';
 
-interface Tag {
-  id: string;
-  raw: string;
-  _content: string;
-}
-
-interface Url {
-  _content: string;
-}
-
-interface ImageSize {
-  label: string;
-  width: number;
-  height: number;
-  source: string;
-}
-
-interface Comment {
-  id: string;
-  authorname: string;
-  _content: string;
-}
 
 const route = useRoute();
 const imageId = route.params.image as string;
@@ -113,33 +70,17 @@ const fallbackImageUrl = '/fallback.png';
 
 const runtimeConfig = useRuntimeConfig();
 
-const fetchImageDetails = async () => {
+const loadImageDetails = async () => {
   try {
-    const apiUrl = `${runtimeConfig.public.flickViewApiUrl}/photo/${imageId}`;
-    const response = await fetch(apiUrl);
-    const data = await response.json();
-    console.log('Image details:', data);
-    image.value = data.data as Image;
-    commentsSize.value = data.data.comments._content;
-    comments.value = await fetchComments(imageId);
+    const apiUrl = runtimeConfig.public.flickViewApiUrl;
+    image.value = await fetchImageDetails(imageId, apiUrl);
+    comments.value = await fetchComments(imageId, apiUrl);
+    commentsSize.value = comments.value.length;
     imageSource.value = image.value.images.find(size => size.label === 'Large')?.source;
   } catch (error) {
     console.error('Error fetching image details:', error);
   } finally {
     loading.value = false;
-  }
-};
-
-const fetchComments = async (imageId: string): Promise<Comment[]> => {
-  try {
-    const apiUrl = `${runtimeConfig.public.flickViewApiUrl}/photo/${imageId}/comments`;
-    const response = await fetch(apiUrl);
-    const data = await response.json();
-    console.log('Comments:', data);
-    return data.data.comment;
-  } catch (error) {
-    console.error('Error fetching comments:', error);
-    return [];
   }
 };
 
