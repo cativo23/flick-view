@@ -43,8 +43,8 @@ export const fetchComments = async (imageId: string, apiUrl: string): Promise<Co
       throw new Error(`Failed to fetch comments: ${response.statusText}`);
     }
     const data = await response.json();
-    if (!data.comments) {
-      throw new Error('Invalid response format');
+    if (!data.data.comments) {
+      return [];
     }
     return data.comments as Comment[];
   } catch (error) {

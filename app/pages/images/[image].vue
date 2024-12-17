@@ -74,13 +74,20 @@ const loadImageDetails = async () => {
   try {
     const apiUrl = runtimeConfig.public.flickViewApiUrl;
     image.value = await fetchImageDetails(imageId, apiUrl);
-    comments.value = await fetchComments(imageId, apiUrl);
-    commentsSize.value = comments.value.length;
     imageSource.value = image.value.images.find(size => size.label === 'Large')?.source;
   } catch (error) {
     console.error('Error fetching image details:', error);
   } finally {
     loading.value = false;
+  }
+};
+
+const getComments = async () => {
+  try {
+    comments.value = await fetchComments(imageId, runtimeConfig.public.flickViewApiUrl);
+    commentsSize.value = comments.value.length;
+  } catch (error) {
+    console.error('Error fetching comments:', error);
   }
 };
 
@@ -94,7 +101,8 @@ const formatDate = (timestamp: number): string => {
 };
 
 onMounted(() => {
-  fetchImageDetails();
+  loadImageDetails();
+  getComments();
 });
 </script>
 
