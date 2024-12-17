@@ -2,9 +2,14 @@ import type { IndexImage } from "../types/IndexImage";
 import type { Image } from '../types/Image';
 import type { Comment } from '../types/Comment';
 
-export const fetchImages = async (apiUrl: string): Promise<{ data: IndexImage[], pagination: { pages: number } }> => {
+export const fetchImages = async (apiUrl: string, token: string): Promise<{ data: IndexImage[], pagination: { pages: number } }> => {
   try {
-    const response = await fetch(apiUrl);
+    const response = await fetch(apiUrl, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
+      }
+    });
     if (!response.ok) {
       throw new Error(`Failed to fetch images: ${response.statusText}`);
     }
@@ -19,9 +24,14 @@ export const fetchImages = async (apiUrl: string): Promise<{ data: IndexImage[],
   }
 };
 
-export const fetchImageDetails = async (imageId: string, apiUrl: string): Promise<Image> => {
+export const fetchImageDetails = async (imageId: string, apiUrl: string, token: string): Promise<Image> => {
   try {
-    const response = await fetch(`${apiUrl}/photo/${imageId}`);
+    const response = await fetch(`${apiUrl}/photo/${imageId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
+      }
+    });
     if (!response.ok) {
       throw new Error(`Failed to fetch image details: ${response.statusText}`);
     }
@@ -36,9 +46,14 @@ export const fetchImageDetails = async (imageId: string, apiUrl: string): Promis
   }
 };
 
-export const fetchComments = async (imageId: string, apiUrl: string): Promise<Comment[]> => {
+export const fetchComments = async (imageId: string, apiUrl: string, token: string): Promise<Comment[]> => {
   try {
-    const response = await fetch(`${apiUrl}/photo/${imageId}/comments`);
+    const response = await fetch(`${apiUrl}/photo/${imageId}/comments`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
+      }
+    });
     if (!response.ok) {
       throw new Error(`Failed to fetch comments: ${response.statusText}`);
     }

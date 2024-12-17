@@ -18,6 +18,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       flickViewApiUrl: 'https://api.flickview.com',
+      apiKey: '',
     },
     turnstile: {
       secretKey: '',

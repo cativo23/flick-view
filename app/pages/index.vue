@@ -128,12 +128,14 @@ const searchImages = async () => {
     errorMessage.value = ''; // Clear any previous error message
     let tagsQueryParam = '';
 
+    console.log(runtimeConfig);
+
     if (tags.value.length > 0) {
       tagsQueryParam = `&tags=${tags.value.join(',')}`;
     }
 
     const apiUrl = `${runtimeConfig.public.flickViewApiUrl}/feed?per_page=12&page=${currentPage.value}` + tagsQueryParam;
-    const data = await fetchImages(apiUrl);
+    const data = await fetchImages(apiUrl, runtimeConfig.public.apiKey);
     images.value = data.data;
     totalPages.value = data.pagination.pages;
     updateQueryParams();

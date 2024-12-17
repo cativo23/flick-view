@@ -73,12 +73,12 @@ const loading = ref<boolean>(true);
 const imageSource = ref<string | undefined>(undefined);
 const fallbackImageUrl = '/fallback.png';
 
-const runtimeConfig = useRuntimeConfig() as RuntimeConfig;
+const runtimeConfig = useRuntimeConfig();
 
 const loadImageDetails = async (): Promise<void> => {
   try {
     const apiUrl = runtimeConfig.public.flickViewApiUrl;
-    image.value = await fetchImageDetails(imageId, apiUrl);
+    image.value = await fetchImageDetails(imageId, apiUrl, runtimeConfig.public.apiKey);
     imageSource.value = image.value.images.find((size: ImageSize) => size.label === 'Large')?.source;
   } catch (error) {
     console.error('Error fetching image details:', error);
@@ -89,7 +89,7 @@ const loadImageDetails = async (): Promise<void> => {
 
 const getComments = async (): Promise<void> => {
   try {
-    comments.value = await fetchComments(imageId, runtimeConfig.public.flickViewApiUrl);
+    comments.value = await fetchComments(imageId, runtimeConfig.public.flickViewApiUrl, runtimeConfig.public.apiKey);
     commentsSize.value = comments.value.length;
   } catch (error) {
     console.error('Error fetching comments:', error);
