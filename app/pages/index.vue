@@ -39,10 +39,10 @@
       </div>
 
     </div>
-    <div v-if="errorMessage" class="text-tokyo-night-red text-center mb-4">
+    <div  class="text-tokyo-night-red text-center mb-4">
       {{ errorMessage }}
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div v-if="!errorMessage" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <div v-if="loading" v-for="num in [1, 2, 3, 4]" :key="num" class="animate-pulse">
         <div class="bg-tokyo-night-bg-lighter rounded-lg overflow-hidden shadow-lg">
           <div class="w-full h-48 bg-tokyo-night-bg"></div>
@@ -67,18 +67,18 @@
             <p class="text-sm text-tokyo-night-text-muted mb-2"><span class="font-bold">By: </span> {{ image.ownername }}</p>
             <p class="text-sm text-tokyo-night-text-muted mb-2"><span class="font-bold">Taken at: </span>  {{ new Date(image.datetaken).toLocaleDateString()
               }}</p>
-            <p class="text-sm text-tokyo-night-text-muted mb-2"><span class="font-bold">Uploaded at: </span>  {{ formatDate(image.dateupload) }}</p>
+            <p class="text-sm text-tokyo-night-text-muted mb-2"><span class="font-bold">Uploaded at: </span>  {{ formatDate(Number(image.dateupload)) }}</p>
             <p class="text-sm text-tokyo-night-text-muted truncate" v-html="image.description._content"></p>
           </div>
         </NuxtLink>
       </div>
     </div>
-    <div class="flex justify-center mt-8">
+    <div v-if="!errorMessage" class="flex justify-center mt-8">
       <button @click="prevPage" :disabled="currentPage === 1" v-if="filteredImages.length !== 0"
         class="px-2 py-2 mx-1 bg-tokyo-night-accent text-tokyo-night-bg rounded-md hover:bg-tokyo-night-accent-hover transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
         <LucideArrowLeft class="w-5 h-5 inline-block mr-2" />
       </button>
-      <button v-for="page in pages" :key="page" @click="goToPage(page)"
+      <button v-for="page in pages" :key="page" @click="typeof page === 'number' ? goToPage(page) : null"
         :class="['px-2 py-2 mx-1 rounded-md transition-colors duration-200', { 'bg-tokyo-night-accent text-tokyo-night-bg': page === currentPage, 'bg-tokyo-night-bg-lighter text-tokyo-night-text': page !== currentPage }]">
         {{ page }}
       </button>
@@ -90,23 +90,25 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
+import { fetchImages } from '../../services/apiService';
+import type { IndexImage } from '../../types/IndexImage';
 
 const runtimeConfig = useRuntimeConfig();
 const router = useRouter();
 const route = useRoute();
 
-const searchTerm = ref('');
-const tags = ref([]);
-const images = ref([]);
-const loading = ref(false);
-const currentPage = ref(parseInt(route.query.page) || 1);
-const totalPages = ref(1);
-const token = ref();
-const captchaResolved = ref(false);
+const searchTerm = ref<string>('');
+const tags = ref<string[]>([]);
+const images = ref<IndexImage[]>([]);
+const loading = ref<boolean>(false);
+const currentPage = ref<number>(parseInt(route.query.page as string) || 1);
+const totalPages = ref<number>(1);
+const token = ref<string>();
+const captchaResolved = ref<boolean>(false);
 const fallbackImageUrl = 'fallback.png';
-const errorMessage = ref('');
+const errorMessage = ref<string>('');
 
 const filteredImages = computed(() => {
   return images.value;
@@ -132,17 +134,12 @@ const searchImages = async () => {
     }
 
     const apiUrl = `${runtimeConfig.public.flickViewApiUrl}/feed?per_page=12&page=${currentPage.value}` + tagsQueryParam;
-    const response = await fetch(apiUrl);
-    if (!response.ok) {
-      throw new Error('Failed to fetch images');
-    }
-    const data = await response.json();
+    const data = await fetchImages(apiUrl);
     images.value = data.data;
     totalPages.value = data.pagination.pages;
     updateQueryParams();
   } catch (error) {
-    errorMessage.value = 'Error fetching images. Please try again later.';
-    console.error('Error fetching images:', error);
+    errorMessage.value = (error as any).message || 'Error fetching images. Please try again later.';
   } finally {
     loading.value = false;
   }
@@ -162,7 +159,7 @@ const prevPage = () => {
   }
 };
 
-const goToPage = (page) => {
+const goToPage = (page: number) => {
   if (page >= 1 && page <= totalPages.value) {
     currentPage.value = page;
     searchImages();
@@ -196,7 +193,7 @@ const pages = computed(() => {
   return range;
 });
 
-const formatDate = (timestamp) => {
+const formatDate = (timestamp: number) => {
   const date = new Date(timestamp * 1000);
   return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
 };
@@ -205,7 +202,7 @@ const onCaptchaSuccess = () => {
   captchaResolved.value = true;
 };
 
-const addTag = (event) => {
+const addTag = (event: { preventDefault: () => void; }) => {
   if (searchTerm.value.trim() !== '') {
     tags.value.push(searchTerm.value.trim());
     searchTerm.value = '';
@@ -213,17 +210,17 @@ const addTag = (event) => {
   }
 };
 
-const removeTag = (index) => {
+const removeTag = (index: number) => {
   tags.value.splice(index, 1);
 };
 
 onMounted(() => {
   // Initialize tags and currentPage from query parameters
   if (route.query.tags) {
-    tags.value = route.query.tags.split(',');
+    tags.value = typeof route.query.tags === 'string' ? route.query.tags.split(',') : [];
   }
   if (route.query.page) {
-    currentPage.value = parseInt(route.query.page);
+    currentPage.value = parseInt(route.query.page as string);
   }
   searchImages();
 });

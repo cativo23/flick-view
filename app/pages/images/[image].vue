@@ -55,7 +55,6 @@
 <script setup lang="ts">
 interface Image {
   id: string;
-  url_m: string;
   title: {
     _content: string;
   };
