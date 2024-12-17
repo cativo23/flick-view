@@ -91,9 +91,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
-import { fetchImages } from '../../services/apiService';
-import type { IndexImage } from '../../types/IndexImage';
+import { fetchImages } from '~~/services/apiService';
+import type { IndexImage } from '~~/types/IndexImage';
 
 const runtimeConfig = useRuntimeConfig();
 const router = useRouter();
@@ -229,7 +228,7 @@ watch([currentPage], () => {
   searchImages();
 });
 
-watch(token, (newToken) => {
+watch(token, (newToken: string | undefined) => {
   if (newToken) {
     captchaResolved.value = true;
   }

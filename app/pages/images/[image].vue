@@ -53,11 +53,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { fetchImageDetails, fetchComments } from '../../../services/apiService';
-import type { Image } from '../../../types/Image';
-import type { Comment } from '../../../types/Comment';
+import { fetchImageDetails, fetchComments } from '~~/services/apiService';
+import type { Image } from '~~/types/Image';
+import type { Comment } from '~~/types/Comment';
+import type { ImageSize } from '~~/types/ImageSize';
 
+interface RuntimeConfig {
+  public: {
+    flickViewApiUrl: string;
+  };
+}
 
 const route = useRoute();
 const imageId = route.params.image as string;
@@ -68,13 +73,13 @@ const loading = ref<boolean>(true);
 const imageSource = ref<string | undefined>(undefined);
 const fallbackImageUrl = '/fallback.png';
 
-const runtimeConfig = useRuntimeConfig();
+const runtimeConfig = useRuntimeConfig() as RuntimeConfig;
 
-const loadImageDetails = async () => {
+const loadImageDetails = async (): Promise<void> => {
   try {
     const apiUrl = runtimeConfig.public.flickViewApiUrl;
     image.value = await fetchImageDetails(imageId, apiUrl);
-    imageSource.value = image.value.images.find(size => size.label === 'Large')?.source;
+    imageSource.value = image.value.images.find((size: ImageSize) => size.label === 'Large')?.source;
   } catch (error) {
     console.error('Error fetching image details:', error);
   } finally {
@@ -82,7 +87,7 @@ const loadImageDetails = async () => {
   }
 };
 
-const getComments = async () => {
+const getComments = async (): Promise<void> => {
   try {
     comments.value = await fetchComments(imageId, runtimeConfig.public.flickViewApiUrl);
     commentsSize.value = comments.value.length;
