@@ -1,26 +1,26 @@
-# ⚠️ Proyecto Archivado
+# ⚠️ Archived Project
 
-**Proyecto de Hackaton Interno - No continuó después del evento**
-
----
-
-## Estado del Proyecto
-
-Este repositorio está **archivado** y ya no recibe mantenimiento activo.
-
-### ¿Por qué se archivó?
-
-- Proyecto desarrollado para un hackaton interno
-- No continuó el desarrollo después del evento
-- Se archiva como referencia del trabajo realizado
+**Internal Hackathon Project - Did Not Continue After Event**
 
 ---
 
-## Información Original
+## Project Status
 
-Flick View es una aplicación web construida con Nuxt que permite buscar y ver imágenes de Flickr.
+This repository is **archived** and is no longer actively maintained.
 
-## Tecnologías
+### Why was this archived?
+
+- Project developed for an internal hackathon
+- Development did not continue after the event
+- Archived as reference of the work done
+
+---
+
+## Original Information
+
+Flick View is a web application built with Nuxt that allows users to search and view images from Flickr.
+
+## Technologies
 
 - Nuxt.js
 - TypeScript
@@ -29,4 +29,4 @@ Flick View es una aplicación web construida con Nuxt que permite buscar y ver i
 
 ---
 
-**Nota:** Este repositorio se mantiene como referencia histórica del proyecto.
+**Note:** This repository is kept as historical reference of the project.
