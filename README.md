@@ -1,78 +1,32 @@
-# Flick View
+# ⚠️ Proyecto Archivado
 
-Flick View is a web application built with [Nuxt](https://nuxt.com) that allows users to search and view images from Flickr. The application is styled using Tailwind CSS and Daisy UI, and it supports pagination and detailed views of individual images with comments.
+**Proyecto de Hackaton Interno - No continuó después del evento**
 
-## Features
+---
 
-- Search images by tags
-- Display images in a responsive grid
-- Skeleton loading screens
-- Pagination with ellipsis for large page numbers
-- Detailed view of individual images with comments
-- Server-Side rendering on Cloudflare Workers
-- ESLint setup
+## Estado del Proyecto
 
-## Setup
+Este repositorio está **archivado** y ya no recibe mantenimiento activo.
 
-Make sure to install the dependencies with [yarn](https://yarnpkg.com/):
+### ¿Por qué se archivó?
 
-```bash
-yarn install
-```
+- Proyecto desarrollado para un hackaton interno
+- No continuó el desarrollo después del evento
+- Se archiva como referencia del trabajo realizado
 
-You can change the api URL by adding a .env file withe nect content:
+---
 
-```bash
-NUXT_PUBLIC_FLICK_VIEW_API_URL="http://localhost/api"
-```
+## Información Original
 
-## Development Server
+Flick View es una aplicación web construida con Nuxt que permite buscar y ver imágenes de Flickr.
 
-Start the development server on `http://localhost:3000`:
+## Tecnologías
 
-```bash
-yarn dev
-```
+- Nuxt.js
+- TypeScript
+- Tailwind CSS
+- Daisy UI
 
-## Production
+---
 
-Build the application for production:
-
-```bash
-yarn build
-```
-
-## Deploy
-
-
-Deploy the application on the Edge with [NuxtHub](https://hub.nuxt.com) on your Cloudflare account:
-
-```bash
-npx nuxthub deploy
-```
-
-Then checkout your server logs, analaytics and more in the [NuxtHub Admin](https://admin.hub.nuxt.com).
-
-You can also deploy using [Cloudflare Pages CI](https://hub.nuxt.com/docs/getting-started/deploy#cloudflare-pages-ci).
-
-## Usage
-
-### Search Images
-
-1. Enter tags in the search bar and press Enter or click the Search button.
-2. The application will display images related to the entered tags.
-
-### View Image Details
-
-1. Click on an image to view its details.
-2. The detailed view includes the image, its title, owner, taken date, upload date, description, and comments.
-
-### Pagination
-
-1. Use the Previous and Next buttons to navigate through pages.
-2. Click on page numbers to jump to a specific page.
-3. Ellipsis (`...`) will appear for large page numbers to simplify navigation.
-
-## License
-
-This project is licensed under the MIT License.
+**Nota:** Este repositorio se mantiene como referencia histórica del proyecto.
